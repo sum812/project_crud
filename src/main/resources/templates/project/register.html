@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký Dự Án</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column align-items-center vh-100">
+<div class="container m-5 p-5">
+    <h2 class="mb-4">Đăng ký Dự Án</h2>
+    <div class="card p-5 m-5">
+        <form th:action="@{/project/register}" th:object="${project}" method="post" class="row g-3 needs-validation"
+              novalidate>
+            <div class="col-md-6">
+                <label class="form-label">Project ID</label>
+                <input type="number" class="form-control" th:field="*{projectId}" required>
+                <div class="invalid-feedback">Vui lòng nhập ID hợp lệ!</div>
+                <span th:if="${#fields.hasErrors('projectId')}" class="text-danger" th:errors="*{projectId}"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Project Name</label>
+                <input type="text" class="form-control" th:field="*{projectName}" required>
+                <div class="invalid-feedback">Vui lòng nhập tên dự án!</div>
+                <span th:if="${#fields.hasErrors('projectName')}" class="text-danger" th:errors="*{projectName}"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Difficulty</label>
+                <select class="form-select" th:field="*{difficulty}" required>
+                    <option value="">Chọn độ khó</option>
+                    <option value="E">Easy</option>
+                    <option value="M">Medium</option>
+                    <option value="H">Hard</option>
+                </select>
+                <div class="invalid-feedback">Vui lòng chọn độ khó!</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Department</label>
+                <select class="form-select" th:field="*{department}" required>
+                    <option value="">Chọn phòng ban</option>
+                    <option th:each="dept : ${departments}" th:value="${dept.deptId}" th:text="${dept.deptNm}"></option>
+                </select>
+                <div class="invalid-feedback">Vui lòng chọn phòng ban!</div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-3">
+                <button type="submit" class="btn btn-primary">Confirm</button>
+                <a th:href="@{/home}">
+                    <button class="btn btn-secondary">Back</button>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+</body>
+</html>
