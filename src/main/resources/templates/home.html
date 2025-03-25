@@ -2,6 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="${_csrf.token}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Home</title>
     <link rel="stylesheet"
@@ -50,14 +51,20 @@
             </thead>
             <tbody>
             <tr th:each="project : ${projects}">
-                <td th:text="${project.projectId}"></td>
+                <td>
+                    <a th:href="@{/project/edit/{id}(id=${project.projectId})}"
+                       class="text-primary text-decoration-underline">
+                        <span th:text="${project.projectId}"></span>
+                    </a>
+                </td>
                 <td th:text="${project.projectNm}"></td>
                 <td th:text="${project.difficulty}"></td>
                 <td th:text="${project.department.deptNm}"></td>
                 <td th:text="${project.insTm}"></td>
                 <td th:text="${project.updTm}"></td>
                 <td th:text="${project.version}"></td>
-                <td><a class="btn text-decoration-underline text-danger">Delete</a></td>
+                <td><a href="#" th:attr="data-project-id=${project.projectId}"
+                       class="btn text-decoration-underline text-danger delete-btn">Delete</a></td>
             </tr>
             </tbody>
         </table>
@@ -92,9 +99,34 @@
         </a>
     </div>
 
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa dự án này không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="toastSuccess" class="toast bg-success text-white" role="alert" data-bs-delay="3000">
+        <div id="toastRegisterSuccess" class="toast bg-success text-white" role="alert" data-bs-delay="3000">
             <div class="toast-body">Dự án đã được đăng ký thành công!</div>
+        </div>
+    </div>
+
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="toastDeleteSuccess" class="toast bg-success text-white" role="alert" data-bs-delay="3000">
+            <div class="toast-body">Xóa dự án thành công!</div>
         </div>
     </div>
 </div>
@@ -105,8 +137,44 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("success")) {
-            let toast = new bootstrap.Toast(document.getElementById("toastSuccess"));
+        if (urlParams.has("registerSuccess")) {
+            let toast = new bootstrap.Toast(document.getElementById("toastRegisterSuccess"));
+            toast.show();
+        }
+
+        let deleteProjectId = null;
+
+        // Khi nhấn vào nút Delete, mở modal xác nhận
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                deleteProjectId = this.getAttribute("data-project-id");
+                let modal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
+                modal.show();
+            });
+        });
+
+        // Khi nhấn vào nút xác nhận xóa
+        document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+            if (deleteProjectId) {
+                fetch(`/project/delete/${deleteProjectId}`, {
+                    method: "DELETE", headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = "/home?deleteSuccess";
+                        } else {
+                            alert("Có lỗi xảy ra khi xóa dự án.");
+                        }
+                    });
+            }
+        });
+
+        // Hiển thị thông báo nếu xóa thành công
+        if (urlParams.has("deleteSuccess")) {
+            let toast = new bootstrap.Toast(document.getElementById("toastDeleteSuccess"));
             toast.show();
         }
     });

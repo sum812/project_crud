@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Edit Project</h2>
+
+<form th:action="@{/project/update}" method="post" th:object="${project}">
+    <input type="hidden" th:field="*{projectId}">
+
+    <label>Project Name:</label>
+    <input type="text" th:field="*{projectNm}" required>
+
+    <label>Difficulty:</label>
+    <input type="text" th:field="*{difficulty}" required>
+
+    <label>Department:</label>
+    <select th:field="*{department.id}">
+        <option th:each="dept : ${departments}"
+                th:value="${dept.id}"
+                th:text="${dept.deptNm}">
+        </option>
+    </select>
+
+    <button type="submit">Update</button>
+</form>
+
+<a href="/project/list">Back to List</a>
+</body>
+</html>

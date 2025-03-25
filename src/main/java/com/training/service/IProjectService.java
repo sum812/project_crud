@@ -13,5 +13,11 @@ public interface IProjectService {
 
     void saveProject(ProjectDTO projectDTO);
 
+    void deleteProjectById(BigDecimal id);
+
+    void updateProject(ProjectDTO projectDTO);
+
+    Project getProjectById(BigDecimal id);
+
     Page<Project> searchProjects(BigDecimal projectId, String projectName, Character difficulty, BigDecimal deptId, Pageable pageable);
 }
